@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Note;
 
 use App\Models\Note\note;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -47,27 +49,27 @@ class NoteController extends Controller
      */
     public function __construct(noteRepository $repository)
     {
-        $this->noteRepository=$repository;
         parent::__construct($repository);
+
     }
 
+    public function index(): View|JsonResponse
+    {
+        $this->repository->scope(fn(Builder $builder) => $builder->where('user_id', Auth::id()));
+
+        return parent::index();
+    }
 
     public function store(): JsonResponse|RedirectResponse
     {
-        $data = $this->request->validated();
-        $data['user_id'] = Auth::id();
-        $this->noteRepository->create($data);
-        return redirect()->route('notes.index');
-    }
 
 
-    public function update($id): JsonResponse|RedirectResponse
-    {
-        $note=Note::find($id);
-        $data = $this->request->validated();
-        $this->noteRepository->update($note->id,$data);
-        return redirect()->route('notes.index');
+        $entity = $this->repository->create($this->request->except(['_token', '_method']),Auth::id());
+
+        return $this->responseDispatcher->store($entity);
+
     }
+
 
 
 

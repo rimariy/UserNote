@@ -13,15 +13,13 @@ class NotePolicy
 
 
     // Any method here that match the controller method name will be automatically called.
-    public function store() {
-        return true;
-    }
-
-    public function index() {
-        return true;
-    }
 
     public function show() {
+        $id=request()->route()->parameter('id');
+        $note=Note::find($id);
+        if ($note->user_id !== Auth::id()) {
+            return false;
+        }
         return true;
     }
 
@@ -29,7 +27,7 @@ class NotePolicy
         $id=request()->route()->parameter('id');
         $note=Note::find($id);
         if ($note->user_id !== Auth::id()) {
-            abort(403);
+            return false;
         }
         return true;
     }
@@ -37,11 +35,16 @@ class NotePolicy
         $id=request()->route()->parameter('id');
         $note=Note::find($id);
         if ($note->user_id !== Auth::id()) {
-            abort(403);
+            return false;
         }
         return true;
     }
 
     public function destroy() {
+        $id=request()->route()->parameter('id');
+        $note=Note::find($id);
+        if ($note->user_id !== Auth::id()) {
+            return false;
+        }
         return true;
     }}
