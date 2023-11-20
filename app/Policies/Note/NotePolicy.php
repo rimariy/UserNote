@@ -13,6 +13,19 @@ class NotePolicy
 
 
     // Any method here that match the controller method name will be automatically called.
+    public function index() {
+        if (Auth::id() == null) {
+            return false;
+        }
+        return true;
+    }
+
+    public function store() {
+        if (Auth::id() == null) {
+            return false;
+        }
+        return true;
+    }
 
     public function show() {
         $id=request()->route()->parameter('id');
